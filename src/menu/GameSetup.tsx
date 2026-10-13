@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react';
 import type { Difficulty } from '../core/difficulty';
 import { getSupportedModes, type Game } from '../core/game';
 import { GAME_MODES, type GameConfig, type GameMode } from '../core/gameMode';
@@ -9,6 +9,9 @@ import { BackButton } from './BackButton';
 import { OpponentSection } from './OpponentSection';
 import { SegmentedControl } from './SegmentedControl';
 import { SpeedSection } from './SpeedSection';
+import type { OnlineStart } from '../online/OnlineSetup';
+
+const OnlineSetup = lazy(() => import('../online/OnlineSetup'));
 
 interface GameSetupProps {
   game: Game;
@@ -38,6 +41,7 @@ export function GameSetup({ game, onSelect, onBack }: GameSetupProps) {
   const [animations, setAnimations] = useState<boolean>(() => resolveInitialAnimations(game.id));
   const style = { '--accent': game.accent } as CSSProperties;
   const isVersus = mode === 'versus';
+  const isOnline = mode === 'online';
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -51,6 +55,17 @@ export function GameSetup({ game, onSelect, onBack }: GameSetupProps) {
 
   const startGame = () => {
     const config: GameConfig = { mode, difficulty, opponent, animations };
+    onSelect(config);
+  };
+
+  const startOnline = (start: OnlineStart) => {
+    const config: GameConfig = {
+      mode,
+      difficulty: start.difficulty,
+      opponent,
+      animations: start.animations,
+      online: start.online,
+    };
     onSelect(config);
   };
 
@@ -70,17 +85,32 @@ export function GameSetup({ game, onSelect, onBack }: GameSetupProps) {
           />
         )}
       </header>
-      {isVersus && <OpponentSection game={game} opponent={opponent} onChange={setOpponent} />}
-      <SpeedSection game={game} difficulty={difficulty} onChange={setDifficulty} />
-      <AnimationSection game={game} enabled={animations} onChange={setAnimations} />
-      <div className="setup__actions">
-        <button type="button" className="start-button" onClick={startGame}>
-          <span className="start-button__icon" aria-hidden="true">
-            ▶
-          </span>
-          Avvia gioco
-        </button>
-      </div>
+      {isOnline ? (
+        <Suspense fallback={<p className="lobby__empty">Caricamento…</p>}>
+          <OnlineSetup
+            game={game}
+            difficulty={difficulty}
+            onDifficultyChange={setDifficulty}
+            animations={animations}
+            onAnimationsChange={setAnimations}
+            onStart={startOnline}
+          />
+        </Suspense>
+      ) : (
+        <>
+          {isVersus && <OpponentSection game={game} opponent={opponent} onChange={setOpponent} />}
+          <SpeedSection game={game} difficulty={difficulty} onChange={setDifficulty} />
+          <AnimationSection game={game} enabled={animations} onChange={setAnimations} />
+          <div className="setup__actions">
+            <button type="button" className="start-button" onClick={startGame}>
+              <span className="start-button__icon" aria-hidden="true">
+                ▶
+              </span>
+              Avvia gioco
+            </button>
+          </div>
+        </>
+      )}
     </main>
   );
 }

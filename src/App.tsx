@@ -56,7 +56,8 @@ function GameScreen({ game, config, onExit, onBack }: GameScreenProps) {
   }, [onBack]);
 
   const style = { '--accent': game.accent } as CSSProperties;
-  const className = config.mode === 'versus' ? 'game-screen game-screen--wide' : 'game-screen';
+  const isTwoBoards = config.mode !== 'solo';
+  const className = isTwoBoards ? 'game-screen game-screen--wide' : 'game-screen';
 
   return (
     <div className={className} style={style}>

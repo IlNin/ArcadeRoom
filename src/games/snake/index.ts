@@ -14,7 +14,7 @@ export const snakeGame: Game = {
   DifficultyPreview: SnakeSpeedPreview,
   AnimationPreview: SnakeAnimationPreview,
   animationHints: SNAKE_ANIMATION_HINTS,
-  modes: ['solo', 'versus'],
+  modes: ['solo', 'versus', 'online'],
   difficultyHints: SNAKE_DIFFICULTY_HINTS,
   opponentHints: SNAKE_OPPONENT_HINTS,
 };

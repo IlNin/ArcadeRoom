@@ -104,3 +104,16 @@ export function loadLastAnimations(gameId: string): boolean | null {
 export function saveLastAnimations(gameId: string, enabled: boolean): void {
   writeItem(LAST_ANIMATIONS_PREFIX + gameId, enabled ? 'on' : 'off');
 }
+
+const NICKNAME_KEY = 'arcade.nickname';
+export const NICKNAME_MAX_LENGTH = 12;
+
+export function loadNickname(): string {
+  const raw = readItem(NICKNAME_KEY);
+  const nickname = raw === null ? '' : raw.slice(0, NICKNAME_MAX_LENGTH);
+  return nickname;
+}
+
+export function saveNickname(nickname: string): void {
+  writeItem(NICKNAME_KEY, nickname);
+}

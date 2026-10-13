@@ -1,42 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getDifficultyLabel } from '../../core/difficulty';
 import type { GameProps } from '../../core/game';
+import { BoardOverlay } from './BoardOverlay';
 import { CPU_PROFILES } from './cpuPlayer';
 import { Dpad } from './Dpad';
 import { BOARD_COLS, BOARD_ROWS, CELL_SIZE, MAX_FRAME_DELTA_MS } from './snakeConfig';
 import { ScoreHeader } from './ScoreHeader';
 import { SNAKE_SETTINGS } from './snakeDifficulty';
 import { createCpuEngine, createPlayerEngine, type SnakeEngine } from './snakeEngine';
-import type { Direction, SnakeStatus } from './snakeLogic';
+import type { Direction } from './snakeLogic';
 import { renderScene } from './snakeRenderer';
 import { useSnakeControls } from './useSnakeControls';
 import { describeVersusProgress, isVersusFinished, resolveVersusResult } from './versusResult';
-
-interface BoardOverlayProps {
-  status: SnakeStatus;
-  paused: boolean;
-  onResume?: () => void;
-}
-
-function BoardOverlay({ status, paused, onResume }: BoardOverlayProps) {
-  if (status !== 'running') {
-    const text = status === 'won' ? 'Completato!' : 'Game over';
-    return (
-      <div className="overlay overlay--soft">
-        <p>{text}</p>
-      </div>
-    );
-  }
-  if (!paused) {
-    return null;
-  }
-  return (
-    <div className="overlay">
-      <p>Pausa</p>
-      {onResume !== undefined && <button onClick={onResume}>Riprendi</button>}
-    </div>
-  );
-}
 
 export function SnakeVersus({ context, config }: GameProps) {
   const settings = SNAKE_SETTINGS[config.difficulty];
